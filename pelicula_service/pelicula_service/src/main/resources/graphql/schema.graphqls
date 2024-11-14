@@ -1,0 +1,266 @@
+
+type Mutation{
+    #Usuario
+    createUser(user: UserRequest):User
+    updateUser(userId: String, userRequest: UserRequest):User
+
+    #Pelicula
+    createMovie(movie: MovieRequest!): Movie
+    updateMovie(movieId: String!, movieRequest: MovieRequest!): Movie
+    deleteMovie(movieId: String!): Boolean
+
+    #Cine
+    createTheater(theaterRequest: TheaterRequest!): Theater
+    updateTheater(theaterId: String!, theaterRequest: TheaterRequest!): Theater
+
+    #Distribucion
+    createDistribution(distributionRequest: DistributionRequest!): Distribution!
+    updateDistribution(distributionId: String!, distributionRequest: DistributionRequest!): Distribution!
+
+    #Material Promocianal
+    createMaterial(materialRequest: PromotionalMaterialRequest!): PromotionalMaterial
+    updateMaterial(materialId: ID!, materialRequest: PromotionalMaterialRequest!): PromotionalMaterial
+
+    #Inventario
+    createDCPInventary(dcpRequest: DCPInventoryRequest!): DCPInventory
+    updateDCPInventary(dcpId: ID!, dcpRequest: DCPInventoryRequest!): DCPInventory
+
+}
+
+type Query {
+    #Usuario
+    getAllUsers:[User]
+    getUserById(userid: String!):User
+
+    #Pelicula
+    getAllMovies: [Movie]
+    getMovieById(movieId: String!): Movie
+
+    #Cine
+    getTheaterById(theaterId: String!): Theater
+    getAllTheaters: [Theater]
+
+    #Distribucion
+    getAllDistributions: [Distribution!]!
+    getDistributionById(distributionId: String!): Distribution!
+
+    #Material Promocianal
+    getAllPromotionalMaterials: [PromotionalMaterial!]
+    getMaterialById(materialId: ID!): PromotionalMaterial
+
+    #Inventario
+    getAllDCPs: [DCPInventory!]
+    getDCPById(dcpId: ID!): DCPInventory
+}
+
+
+enum Role {
+    ADMIN
+    CLIENT
+    EMPLOYEE
+}
+
+type User{
+    id: ID
+    name: String
+    email: String
+    role: Role
+    status: Boolean
+    registrationDate: String
+    lastAccess: String
+}
+
+input UserRequest{
+    id: String
+    name: String!
+    email: String!
+    status: Boolean
+    password: String
+    role: Role
+}
+
+#Pelicula
+input MovieRequest {
+    title: String!
+    genre: String!
+    releaseDate: String!
+    classification: String!
+    duration: String!
+    distributor: String!
+    status: MovieStatus!
+    synopsis: String
+    marketingBudget: Float
+    availableLanguages: [String]
+}
+
+type Movie {
+    id: ID!
+    title: String!
+    genre: String!
+    releaseDate: String!
+    classification: String!
+    duration: String!
+    distributor: String!
+    status: MovieStatus!
+    synopsis: String
+    marketingBudget: Float
+    availableLanguages: [String]
+}
+
+enum MovieStatus {
+    UPCOMING
+    IN_THEATERS
+    FINISHED
+}
+#Cine
+input TheaterRequest {
+    name: String
+    address: String
+    city: String
+    contactPerson: String
+    email: String
+    phone: String
+    isActive: Boolean
+    rooms: [RoomInput]
+}
+
+type Theater {
+    id: String
+    name: String
+    address: String
+    city: String
+    contactPerson: String
+    email: String
+    phone: String
+    isActive: Boolean
+    rooms: [Room]
+}
+
+input RoomInput {
+    number: String
+    capacity: Int
+}
+
+type Room {
+    number: String
+    capacity: Int
+}
+
+#Distribuciones
+type Distribution {
+    id: ID!
+    userId: String!
+    movieId: String!
+    theaterId: String!
+    startDate: String!
+    endDate: String!
+    status: DistributionStatus!
+    revenue: Float
+    viewers: Int
+    assignedDCPId: String
+}
+
+
+# Input para crear o actualizar distribuciones
+input DistributionRequest {
+    userId: String!
+    movieId: String!
+    theaterId: String!
+    status: DistributionStatus!
+    startDate: String!
+    endDate: String!
+    revenue: Float
+    viewers: Int
+    assignedDCPId: String
+}
+
+enum DistributionStatus {
+    SCHEDULED
+    IN_PROGRESS
+    FINISHED
+}
+
+#Materia Promocional
+type PromotionalMaterial {
+    id: ID!
+    movieId: String!
+    type: MaterialType!
+    quantity: Int!
+    warehouseLocation: String!
+    status: MaterialStatus!
+    distributions: [Distribution_2!]
+}
+
+type Distribution_2 {    #los repetidos
+    theaterId: String!
+    quantity: Int!
+    date: String!
+}
+
+enum MaterialType {
+    POSTER
+    BANNER
+    BACKING
+    FLYER
+    OTHER
+}
+
+enum MaterialStatus {
+    AVAILABLE
+    ASSIGNED
+    OUT_OF_STOCK
+}
+
+input PromotionalMaterialRequest {
+    movieId: String!
+    type: MaterialType!
+    quantity: Int!
+    warehouseLocation: String!
+    status: MaterialStatus!
+    distributions: [DistributionRequest_2]
+}
+
+input DistributionRequest_2 {  #los repetidos
+    theaterId: String!
+    quantity: Int!
+    date: String!
+}
+
+#Inventario
+type DCPInventory {
+    id: ID!
+    movieId: String!
+    code: String!
+    status: DCPStatus!
+    receptionDate: String!
+    location: String
+    history: [DCPHistory!]
+}
+
+type DCPHistory {
+    date: String!
+    status: String!
+    description: String
+}
+
+enum DCPStatus {
+    AVAILABLE
+    IN_USE
+    IN_TRANSIT
+    DAMAGED
+}
+
+input DCPInventoryRequest {
+    movieId: String!
+    code: String!
+    status: DCPStatus!
+    receptionDate: String!
+    location: String
+    history: [DCPHistoryRequest]
+}
+
+input DCPHistoryRequest {
+    date: String!
+    status: String!
+    description: String
+}

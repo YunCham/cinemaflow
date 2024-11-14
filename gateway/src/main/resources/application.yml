@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 5000
+      routes:
+        - id: pelicula-service
+          uri: lb://pelicula-service
+          predicates:
+            - Path=/pelicula-service/**
+          filters:
+            - RewritePath=/pelicula-service(?<segment>/?.*),$\{segment}
+
+  profiles:
+    default: default-on
+server:
+  port: 4040
+eureka:
+  client:
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+
